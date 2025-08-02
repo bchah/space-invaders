@@ -17,6 +17,7 @@ let gameLoopInterval
 let shooterListener = null
 let laserListener = null
 let keyListener = null
+let startKeyListener = null; // Listener for starting the game
 let isGoingRight = true
 let direction = 1
 let results = 0
@@ -71,6 +72,11 @@ const init = () => {
     if (keyListener) {
         document.removeEventListener("keyup", keyListener)
         keyListener = null
+    }
+
+    if (startKeyListener) {
+        document.removeEventListener("keydown", startKeyListener);
+        startKeyListener = null;
     }
 
     resultDisplay.innerHTML = "0"
@@ -162,6 +168,7 @@ function handleLoss() {
             totalAliensDestroyed = 0; // Reset total aliens destroyed
             init();
         });
+        initStartKeyListener(); // Listen for any valid key to start again
     squares.forEach(square => {
         square.classList.remove("shooter", "invader", "laser", "boom")
         square.style.backgroundColor = ""
@@ -204,6 +211,7 @@ function handleWin() {
         trophy.addEventListener("click", () => {
             init();
         });
+        initStartKeyListener(); // Listen for any valid key to start again
         
 }
 
@@ -318,15 +326,41 @@ function shoot(e) {
     }
 }
 
+function startGame() {
+    if (document.querySelector(".title-screen") !== null) {
+        // animate opacity to 0
+        document.querySelector(".title-screen").style.opacity = "0";
+        setTimeout(() => {
+            document.querySelector(".title-screen").remove();
+        }, 200);
+    }
+    init();
+}
+
+// Listen for any valid key to start game
+function initStartKeyListener() {
+    startKeyListener = (e) => {
+        if (
+            e.key === "Enter" ||
+            e.key === " " ||
+            e.key === "ArrowDown" ||
+            e.key === "ArrowUp" ||
+            e.key === "ArrowLeft" ||
+            e.key === "ArrowRight"
+        ) {
+            startGame();
+            document.removeEventListener("keydown", startKeyListener);
+        }
+    };
+    document.addEventListener("keydown", startKeyListener);
+}
+
 function initTitle() {
 document.querySelector(".title-screen")?.addEventListener("click", () => {
-    // animate opacity to 0
-    document.querySelector(".title-screen").style.opacity = "0";
-    setTimeout(() => {
-        document.querySelector(".title-screen").remove();
-    }, 200);
-    init();
+    startGame();
 });
+
+initStartKeyListener();
 
 }
 
