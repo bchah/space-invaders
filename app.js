@@ -8,6 +8,8 @@ let numAliens = startingAliens; // Total number of aliens
 let totalAliensDestroyed = 0; 
 const startingGameSpeed = 700; // Initial game speed
 let gameSpeed = startingGameSpeed;
+const startingLaserSpeed = 300;
+let laserSpeed = startingLaserSpeed; // Initial laser speed
 let level = 1;
 let squares = []
 let currentShooterIndex = shooterStartIndex
@@ -87,8 +89,12 @@ const init = () => {
     }
 
     squares = Array.from(document.querySelectorAll(".grid div"))
-    totalAliensDestroyed = 0;
-    document.getElementById('status').innerText = "Level " + level; // Show current level
+    if (level == 10) {
+        document.getElementById('status').innerText = "Final Level";
+    } else {
+        document.getElementById('status').innerText = "Level " + level; // Show current level
+    }
+    resultDisplay.innerText = results;
     draw()
     squares[currentShooterIndex].classList.add("shooter")
     shooterListener = document.addEventListener("keydown", moveShooter);
@@ -153,6 +159,7 @@ function handleLoss() {
             level = 1; // Reset level
             gameSpeed = startingGameSpeed; // Reset speed
             numAliens = startingAliens; // Reset number of aliens
+            totalAliensDestroyed = 0; // Reset total aliens destroyed
             init();
         });
     squares.forEach(square => {
@@ -163,6 +170,21 @@ function handleLoss() {
 
 function handleWin() {
         isPlaying = false;
+        // Remove shooter and invaders
+        squares.forEach(square => {
+            square.classList.remove("shooter", "invader", "laser", "boom")
+            square.style.backgroundColor = ""
+        });
+        clearInterval(gameLoopInterval)
+        document.removeEventListener("keydown", shooterListener);
+        document.removeEventListener("keydown", laserListener);
+        shooterListener = null;
+        laserListener = null;
+        gameLoopInterval = null;
+        
+        level++; // Increase level
+        if (level > 10) {gameWasBeaten(); return;} // After 10 levels
+
         resultDisplay.innerHTML = "You Win!"
         document.querySelector(".grid").appendChild(document.createElement("div"));
         document.querySelector(".grid div:last-child").classList.add("trophy");
@@ -176,23 +198,38 @@ function handleWin() {
         trophy.addEventListener("mouseover", function() {
             resultDisplay.innerHTML = "Continue?";
         });
+        gameSpeed = Math.max(50, gameSpeed - 70); // Increase speed
+        numAliens = Math.min(100, numAliens + 10); // Increase number of aliens, max 100
+        laserSpeed = Math.max(50, laserSpeed - 20); // Increase laser speed
         trophy.addEventListener("click", () => {
-            level++; // Increase level
-            gameSpeed = Math.max(50, gameSpeed - 50); // Increase speed
-            numAliens = Math.min(120, numAliens + 5); // Increase number of aliens, max 120
             init();
         });
-        // Remove shooter and invaders
-        squares.forEach(square => {
-            square.classList.remove("shooter", "invader", "laser", "boom")
-            square.style.backgroundColor = ""
+        
+}
+
+function gameWasBeaten() {
+    isPlaying = false;
+    resultDisplay.innerHTML = "";
+    document.body.appendChild(document.createElement("div"));
+        const trophy = document.body.lastChild;
+        trophy.classList.add("victory");
+        trophy.style.backgroundImage = "url('./victory.png')";
+        // fade in the trophy
+        trophy.style.opacity = "0";
+        setTimeout(() => {
+            trophy.style.opacity = "1";
+        }, 100);
+        level = 1; // Reset level
+        gameSpeed = startingGameSpeed; // Reset speed
+        numAliens = startingAliens; // Reset number of aliens
+        totalAliensDestroyed = 0; // Reset total aliens destroyed
+        trophy.addEventListener("click", () => {
+            trophy.style.opacity = "0";
+            setTimeout(() => {
+                trophy.remove();
+                init();
+            }, 200);
         });
-        clearInterval(gameLoopInterval)
-        document.removeEventListener("keydown", shooterListener);
-        document.removeEventListener("keydown", laserListener);
-        shooterListener = null;
-        laserListener = null;
-        gameLoopInterval = null;
 }
 
 function moveInvaders() {
@@ -275,12 +312,13 @@ function shoot(e) {
     }
 
     if (e.key === "ArrowUp") {
-        if (Date.now() - lastShotTime < 150) return; // Prevent rapid firing
+        if (Date.now() - lastShotTime < laserSpeed) return; // Prevent rapid firing
         lastShotTime = Date.now();
        moveLaser();
     }
 }
 
+function initTitle() {
 document.querySelector(".title-screen")?.addEventListener("click", () => {
     // animate opacity to 0
     document.querySelector(".title-screen").style.opacity = "0";
@@ -289,4 +327,8 @@ document.querySelector(".title-screen")?.addEventListener("click", () => {
     }, 200);
     init();
 });
+
+}
+
+initTitle();
 
