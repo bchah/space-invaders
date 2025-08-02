@@ -1,0 +1,95 @@
+body {
+	background-color: rgb(20, 20, 20);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+
+.grid {
+	width: 300px;
+	height: 300px;
+	border: solid black 1px;
+	background-image: url("./background.png");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	display: flex;
+	flex-wrap: wrap;
+	position: relative;
+	zoom: 1.5;
+}
+
+.grid div {
+	width: 20px;
+	height: 20px;
+}
+
+.trophy {
+	position: absolute;
+	opacity: 0;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	width: 80%;
+	height: 80%;
+	zoom: 5;
+	transition: all 0.2s linear;
+}
+
+.trophy:hover {
+	cursor: pointer;
+	filter: brightness(1.3);
+}
+
+.results {
+	position: absolute;
+	bottom: -12px;
+	right: 10px;
+	font-size: 24px;
+	color: white;
+	text-shadow: 2px 2px 4px black;
+	pointer-events: none;
+}
+
+.level-container {
+	position: absolute;
+	bottom: -12px;
+	left: 6px;
+	font-size: 14px;
+	color: white;
+	text-shadow: 1px 1px 2px black;
+}
+
+.invader {
+	background-image: url("./streamwell.png");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.shooter {
+	background-image: url("./craft.png");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.laser {
+	background-image: url("./laser.png");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	width: 30px;
+}
+
+.boom {
+	background-image: url("./fire.png");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
