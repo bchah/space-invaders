@@ -5,6 +5,7 @@ const shooterStartIndex = 202
 const width = 15
 const startingAliens = 10;
 let numAliens = startingAliens; // Total number of aliens
+let totalAliensDestroyed = 0; 
 const startingGameSpeed = 700; // Initial game speed
 let gameSpeed = startingGameSpeed;
 let level = 1;
@@ -13,11 +14,15 @@ let currentShooterIndex = shooterStartIndex
 let gameLoopInterval
 let shooterListener = null
 let laserListener = null
+let keyListener = null
 let isGoingRight = true
 let direction = 1
 let results = 0
 let alienInvaders = []
 let invaderColorMap = []
+const keysDown = new Set();
+let lastShotTime = 0;
+let isPlaying = false;
 
 
 
@@ -34,6 +39,7 @@ function draw() {
 }
 
 const init = () => {
+    isPlaying = true;
     currentShooterIndex = shooterStartIndex
     isGoingRight = true
     direction = 1
@@ -60,6 +66,11 @@ const init = () => {
         gameLoopInterval = null
     }
 
+    if (keyListener) {
+        document.removeEventListener("keyup", keyListener)
+        keyListener = null
+    }
+
     resultDisplay.innerHTML = "0"
 
     for (let i = 0; i < numAliens; i++) {
@@ -76,11 +87,16 @@ const init = () => {
     }
 
     squares = Array.from(document.querySelectorAll(".grid div"))
+    totalAliensDestroyed = 0;
+    document.getElementById('status').innerText = "Level " + level; // Show current level
     draw()
     squares[currentShooterIndex].classList.add("shooter")
     shooterListener = document.addEventListener("keydown", moveShooter);
     gameLoopInterval = setInterval(moveInvaders, gameSpeed)
     laserListener = document.addEventListener('keydown', shoot)
+    keyListener = document.addEventListener("keyup", (e) => {
+        keysDown.delete(e.key);
+    });
 
 }
 
@@ -93,6 +109,7 @@ function remove() {
 }
 
 function moveShooter(e) {
+    if (!squares || !isPlaying) return; // Check if squares are initialized and game is active
     squares[currentShooterIndex].classList.remove("shooter")
     switch (e.key) {
         case "ArrowLeft":
@@ -106,6 +123,7 @@ function moveShooter(e) {
 }
 
 function handleLoss() {
+    isPlaying = false;
     resultDisplay.innerHTML = "Game Over!"
     clearInterval(gameLoopInterval)
     document.removeEventListener("keydown", shooterListener);
@@ -113,10 +131,16 @@ function handleLoss() {
     shooterListener = null;
     laserListener = null;
     gameLoopInterval = null;
+    document.getElementById('status').innerText = "Total Score: " + totalAliensDestroyed; // Show total aliens destroyed
     document.querySelector(".grid").appendChild(document.createElement("div"));
     document.querySelector(".grid div:last-child").classList.add("trophy");
     const trophy = document.querySelector(".trophy");
     trophy.style.backgroundImage = "url('./sad-trophy.png')";
+    // Remove shooter and invaders
+    squares.forEach(square => {
+        square.classList.remove("shooter", "invader", "laser", "boom")
+        square.style.backgroundColor = ""
+    });
     // fade in the trophy
     trophy.style.opacity = "0";
     setTimeout(() => {
@@ -127,7 +151,6 @@ function handleLoss() {
         });
         trophy.addEventListener("click", () => {
             level = 1; // Reset level
-            document.getElementById('level').innerText = level; // Update level display
             gameSpeed = startingGameSpeed; // Reset speed
             numAliens = startingAliens; // Reset number of aliens
             init();
@@ -139,6 +162,7 @@ function handleLoss() {
 }
 
 function handleWin() {
+        isPlaying = false;
         resultDisplay.innerHTML = "You Win!"
         document.querySelector(".grid").appendChild(document.createElement("div"));
         document.querySelector(".grid div:last-child").classList.add("trophy");
@@ -154,10 +178,14 @@ function handleWin() {
         });
         trophy.addEventListener("click", () => {
             level++; // Increase level
-            document.getElementById('level').innerText = level; // Update level display
             gameSpeed = Math.max(50, gameSpeed - 50); // Increase speed
             numAliens = Math.min(120, numAliens + 5); // Increase number of aliens, max 120
             init();
+        });
+        // Remove shooter and invaders
+        squares.forEach(square => {
+            square.classList.remove("shooter", "invader", "laser", "boom")
+            square.style.backgroundColor = ""
         });
         clearInterval(gameLoopInterval)
         document.removeEventListener("keydown", shooterListener);
@@ -204,6 +232,8 @@ function moveInvaders() {
 }
 
 function shoot(e) {
+    if (e.key !== "ArrowUp" || keysDown.has(e.key) || !isPlaying) return;
+    keysDown.add(e.key);
 
     let currentLaserIndex = currentShooterIndex
 
@@ -211,9 +241,15 @@ function shoot(e) {
         if (!squares) {
             return;
         }
+
+        try {
         squares[currentLaserIndex].classList.remove("laser")
         currentLaserIndex -= width
         squares[currentLaserIndex].classList.add("laser")
+        } catch (error) {
+            // Catch error where currentLaserIndex has changed to an invalid index
+            return;
+        }
 
         if (squares[currentLaserIndex].classList.contains("invader")) {
             // Laser hit!
@@ -230,17 +266,27 @@ function shoot(e) {
             setTimeout(() => squares[currentLaserIndex].classList.remove("boom"), 250)
             results++
             resultDisplay.innerHTML = results
+            totalAliensDestroyed++
         } else {
             setTimeout(() => {
                 moveLaser();
-            }, 60);
+            }, 100);
         }
     }
 
     if (e.key === "ArrowUp") {
+        if (Date.now() - lastShotTime < 150) return; // Prevent rapid firing
+        lastShotTime = Date.now();
        moveLaser();
     }
 }
 
-init();
+document.querySelector(".title-screen")?.addEventListener("click", () => {
+    // animate opacity to 0
+    document.querySelector(".title-screen").style.opacity = "0";
+    setTimeout(() => {
+        document.querySelector(".title-screen").remove();
+    }, 200);
+    init();
+});
 
