@@ -147,7 +147,7 @@ function handleLoss() {
     document.querySelector(".grid").appendChild(document.createElement("div"));
     document.querySelector(".grid div:last-child").classList.add("trophy");
     const trophy = document.querySelector(".trophy");
-    trophy.style.backgroundImage = "url('./sad-trophy.png')";
+    trophy.style.backgroundImage = "url('./sad-trophy.webp')";
     // Remove shooter and invaders
     squares.forEach(square => {
         square.classList.remove("shooter", "invader", "laser", "boom")
@@ -196,7 +196,7 @@ function handleWin() {
         document.querySelector(".grid").appendChild(document.createElement("div"));
         document.querySelector(".grid div:last-child").classList.add("trophy");
         const trophy = document.querySelector(".trophy");
-        trophy.style.backgroundImage = "url('./trophy.png')";
+        trophy.style.backgroundImage = "url('./trophy.webp')";
         // fade in the trophy
         trophy.style.opacity = "0";
         setTimeout(() => {
@@ -221,7 +221,7 @@ function gameWasBeaten() {
     document.body.appendChild(document.createElement("div"));
         const trophy = document.body.lastChild;
         trophy.classList.add("victory");
-        trophy.style.backgroundImage = "url('./victory.png')";
+        trophy.style.backgroundImage = "url('./victory.webp')";
         // fade in the trophy
         trophy.style.opacity = "0";
         setTimeout(() => {

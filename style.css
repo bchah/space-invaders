@@ -9,7 +9,7 @@ body {
 }
 
 .title-screen {
-	background-image: url("./title-screen.png");
+	background-image: url("./title-screen.webp");
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -26,7 +26,7 @@ body {
 }
 
 .victory {
-	background-image: url("./victory.png");
+	background-image: url("./victory.webp");
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -46,7 +46,7 @@ body {
 	width: 300px;
 	height: 300px;
 	border: solid black 1px;
-	background-image: url("./background.png");
+	background-image: url("./background.webp");
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -114,21 +114,21 @@ body {
 }
 
 .invader {
-	background-image: url("./streamwell.png");
+	background-image: url("./streamwell.webp");
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
 }
 
 .shooter {
-	background-image: url("./craft.png");
+	background-image: url("./craft.webp");
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
 }
 
 .laser {
-	background-image: url("./laser.png");
+	background-image: url("./laser.webp");
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -136,7 +136,7 @@ body {
 }
 
 .boom {
-	background-image: url("./fire.png");
+	background-image: url("./fire.webp");
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
